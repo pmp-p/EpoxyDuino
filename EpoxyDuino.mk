@@ -46,6 +46,20 @@ EPOXY_DUINO_LIB_DIR := $(abspath $(EPOXY_DUINO_DIR)/libraries)
 # Look for libraries which are siblings to ./EpoxyDuino/
 EPOXY_DUINO_SIBLING_DIR := $(abspath $(EPOXY_DUINO_DIR)/..)
 
+# The name of the platform-specific `ArduinoXxx.h` file that will override the
+# default `<Arduino.h>` file. If `ARDUINO_HEADER` is not defined, the the
+# default header file will be `<ArduinoGeneric.h>` which is very close to the
+# AVR version of `<Arduino.h>` with a few extensions.
+#
+# For example, add the following to the `Makefile` in the application/sketch
+# folder:
+#
+# ARDUINO_HEADER = ArduinoESP8266.h
+#
+# to override the the `<ArduinoGeneric.h>` with `<ArduinoESP8266.h>`. This file
+# must be provided by one of the external libraries listed in `ARDUINO_LIBS`.
+ARDUINO_HEADER ?=
+
 # List of Arduino IDE library folders, both built-in to the Arduino IDE
 # and those downloaded later, e.g. in the portable/ directory or .arduino15/
 # directory.
@@ -80,6 +94,9 @@ endif
 # pre-processor (-I, -D, etc)
 CPPFLAGS_EXPANSION = -I$(module) -I$(module)/src
 CPPFLAGS ?=
+ifdef ARDUINO_HEADER
+	CPPFLAGS += -D EPOXY_DUINO_ARDUINO_HEADER='<$(ARDUINO_HEADER)>'
+endif
 CPPFLAGS += $(foreach module,$(ALL_MODULES),$(CPPFLAGS_EXPANSION))
 
 # Define a macro to indicate that EpoxyDuino is being used. Defined here
